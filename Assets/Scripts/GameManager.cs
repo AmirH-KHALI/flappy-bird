@@ -3,60 +3,59 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    private Player player;
-    private Spawner spawner;
-
+    public Bird bird;
     public Text scoreText;
-    public GameObject playButton;
     public GameObject gameOver;
-    public int score { get; private set; }
+    public GameObject playBottom;
 
-    private void Awake()
-    {
-        Application.targetFrameRate = 60;
+    public AudioSource audioSource;
+    public AudioClip hit;
+    public AudioClip point;
 
-        player = FindObjectOfType<Player>();
-        spawner = FindObjectOfType<Spawner>();
 
+
+    private int score = 0;
+
+    private void Awake() {
         Pause();
     }
 
-    public void Play()
-    {
+    private void Pause() {
+        Time.timeScale = 0f;
+        bird.enabled = false;
+
+    }
+
+    public void Play() {
         score = 0;
         scoreText.text = score.ToString();
 
-        playButton.SetActive(false);
+        playBottom.SetActive(false);
         gameOver.SetActive(false);
-
         Time.timeScale = 1f;
-        player.enabled = true;
+        bird.enabled = true;
 
-        Pipes[] pipes = FindObjectsOfType<Pipes>();
-
-        for (int i = 0; i < pipes.Length; i++) {
-            Destroy(pipes[i].gameObject);
+        Pipe[] pipes = FindObjectsOfType<Pipe>();
+        foreach (Pipe pipe in pipes) {
+            Destroy(pipe.gameObject);
         }
     }
 
-    public void GameOver()
-    {
-        playButton.SetActive(true);
+    public void GameOver() {
+        audioSource.PlayOneShot(hit);
+
+        Debug.Log("Game Over!");
+        playBottom.SetActive(true);
         gameOver.SetActive(true);
 
         Pause();
     }
 
-    public void Pause()
-    {
-        Time.timeScale = 0f;
-        player.enabled = false;
-    }
+    public void IncreaseScore() {
+        audioSource.PlayOneShot(point);
 
-    public void IncreaseScore()
-    {
         score++;
         scoreText.text = score.ToString();
+        Debug.Log("Score: " + score);
     }
-
 }
